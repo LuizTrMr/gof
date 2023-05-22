@@ -3,11 +3,12 @@ package main
 import (
 	"flag"
 	"fmt"
-	"gof/finder"
 	"log"
 	"os"
 	"strings"
 	"sync"
+
+	"github.com/LuizTrMr/gof/finder"
 )
 
 func main() {
