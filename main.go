@@ -11,6 +11,8 @@ import (
 	"github.com/LuizTrMr/gof/finder"
 )
 
+var notProcessed []string = []string{}
+
 func main() {
 	var searchTerm string
 	flag.StringVar(&searchTerm, "st", "", "Term to be searched")
@@ -61,6 +63,12 @@ func main() {
 			find(path, searchTerm)
 		}
 	}
+
+	if len(notProcessed) > 0 {
+		fmt.Println()
+		fmt.Println("------ Not Processed Summary ------")
+		fmt.Print(strings.Join(notProcessed, ""))
+	}
 }
 
 const (
@@ -71,7 +79,7 @@ const (
 func find(fileName, searchTerm string) {
 	data, err := os.ReadFile(fileName)
 	if err != nil {
-		log.Fatalln("ERROR (Couldn't read file): ", err)
+		notProcessed = append(notProcessed, fmt.Sprintln("ERROR (Couldn't read file): ", err))
 	}
 
 	// Empty file
@@ -117,7 +125,7 @@ func findThreaded(fileName, searchTerm string, wg *sync.WaitGroup) {
 	defer wg.Done()
 	data, err := os.ReadFile(fileName)
 	if err != nil {
-		log.Fatalln("ERROR (Couldn't read file): ", err)
+		notProcessed = append(notProcessed, fmt.Sprintln("ERROR (Couldn't read file): ", err))
 	}
 
 	// Empty file
@@ -164,7 +172,7 @@ func scanDirectoryThreaded(path, searchTerm string, excludes []string, wg *sync.
 	}
 	files, err := os.ReadDir(path)
 	if err != nil {
-		log.Fatalln("ERROR (Couldn't read directory):", err)
+		notProcessed = append(notProcessed, fmt.Sprintln("ERROR (Couldn't read directory):", err))
 	}
 
 	for _, file := range files {
@@ -191,7 +199,7 @@ func scanDirectory(path, searchTerm string, excludes []string) {
 	}
 	files, err := os.ReadDir(path)
 	if err != nil {
-		log.Fatalln("ERROR (Couldn't read directory):", err)
+		notProcessed = append(notProcessed, fmt.Sprintln("ERROR (Couldn't read directory):", err))
 	}
 
 	for _, file := range files {
@@ -227,7 +235,7 @@ func isTextFile(path string) bool {
 	file, err := os.Open(path)
 	defer file.Close()
 	if err != nil {
-		log.Fatalln("ERROR (Could not open file): ", err)
+		notProcessed = append(notProcessed, fmt.Sprintln("ERROR (Could not open file): ", err))
 	}
 	var buf [512]byte
 	n, err := file.Read(buf[:])
